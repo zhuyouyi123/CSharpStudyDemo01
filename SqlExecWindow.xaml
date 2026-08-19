@@ -1,0 +1,232 @@
+<Window x:Class="StudyDemo01.SqlExecWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="执行SQL" Height="600" Width="900"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource SurfaceBrush}"
+        Loaded="Window_Loaded">
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,0,0,12">
+            <Border Background="{StaticResource SuccessBrush}" Width="4" Height="24"
+                    CornerRadius="2" Margin="0,0,12,0"/>
+            <TextBlock Text="SQL 执行器" FontSize="18" FontWeight="SemiBold"
+                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="txtTableCount" FontSize="12"
+                       Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+        </StackPanel>
+
+        <!-- Left Panel -->
+        <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource CardBrush}" CornerRadius="8"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <DockPanel>
+                <Border DockPanel.Dock="Top" Background="#F1F5F9" CornerRadius="8,8,0,0" Padding="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <RadioButton x:Name="rbTabTables" Content="表列表" IsChecked="True"
+                                     Grid.Column="0" FontSize="12" FontWeight="SemiBold"
+                                     Foreground="{StaticResource TextSecondaryBrush}"
+                                     HorizontalContentAlignment="Center" Margin="0,6,0,6"
+                                     Checked="RbTab_Checked" Cursor="Hand">
+                            <RadioButton.Template>
+                                <ControlTemplate TargetType="RadioButton">
+                                    <Border x:Name="border" Background="Transparent" Padding="0,6">
+                                        <ContentPresenter HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#DBEAFE"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#EFF6FF"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </RadioButton.Template>
+                        </RadioButton>
+                        <RadioButton x:Name="rbTabSaved" Content="已保存SQL" IsChecked="False"
+                                     Grid.Column="1" FontSize="12" FontWeight="SemiBold"
+                                     Foreground="{StaticResource TextSecondaryBrush}"
+                                     HorizontalContentAlignment="Center" Margin="0,6,0,6"
+                                     Checked="RbTab_Checked" Cursor="Hand">
+                            <RadioButton.Template>
+                                <ControlTemplate TargetType="RadioButton">
+                                    <Border x:Name="border" Background="Transparent" Padding="0,6">
+                                        <ContentPresenter HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#DCFCE7"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#F0FDF4"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </RadioButton.Template>
+                        </RadioButton>
+                    </Grid>
+                </Border>
+
+                <!-- Table List -->
+                <ListBox x:Name="lstTables" BorderThickness="0" Background="Transparent"
+                         FontFamily="Consolas" FontSize="12"
+                         MouseDoubleClick="LstTables_MouseDoubleClick"
+                         Visibility="Visible">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="8,5"/>
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="border" Background="Transparent"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#EFF6FF"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#DBEAFE"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+
+                <!-- Saved SQL List -->
+                <Grid x:Name="panelSavedSql" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ListBox x:Name="lstSavedSql" BorderThickness="0" Background="Transparent"
+                             FontSize="12" MouseDoubleClick="LstSavedSql_MouseDoubleClick"
+                             SelectionChanged="LstSavedSql_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding RowNum}" Width="24"
+                                               Foreground="#94A3B8" FontSize="11"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="8,5"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="border" Background="Transparent"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F0FDF4"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#DCFCE7"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <Button Grid.Row="1" Content="删除选中" Height="28" FontSize="11"
+                            Background="#FEF2F2" Foreground="{StaticResource DangerBrush}"
+                            BorderBrush="{StaticResource DangerBrush}" BorderThickness="1"
+                            Margin="8,6,8,8" Click="BtnDeleteSaved_Click"/>
+                </Grid>
+            </DockPanel>
+        </Border>
+
+        <GridSplitter Grid.Row="1" Grid.Column="1" Width="6"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                      Background="Transparent" Cursor="SizeWE"/>
+
+        <!-- Right: SQL Editor + Result -->
+        <Grid Grid.Row="1" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="160"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="#F8FAFC" CornerRadius="8"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <Grid Margin="4">
+                    <TextBox x:Name="txtSql" AcceptsReturn="True" AcceptsTab="True"
+                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                             FontFamily="Consolas" FontSize="13" Background="Transparent"
+                             BorderThickness="0" TextWrapping="NoWrap"/>
+                    <TextBlock x:Name="txtPlaceholder" Text="请输入 SQL 语句... (F5 执行)"
+                               FontSize="13" Foreground="#94A3B8" FontFamily="Consolas"
+                               IsHitTestVisible="False" Margin="8,6,0,0"/>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10">
+                <Button Content="执行 (F5)" Width="100" Height="34"
+                        FontSize="13" FontWeight="SemiBold"
+                        Background="{StaticResource SuccessBrush}" Foreground="White"
+                        BorderThickness="0" Click="BtnExecute_Click"/>
+                <Button Content="清空" Width="70" Height="34" Margin="8,0,0,0"
+                        FontSize="13" Background="{StaticResource TextSecondaryBrush}" Foreground="White"
+                        BorderThickness="0" Click="BtnClear_Click"/>
+                <Button x:Name="btnSave" Content="保存SQL" Width="90" Height="34" Margin="8,0,0,0"
+                        FontSize="13" Background="{StaticResource PrimaryBrush}" Foreground="White"
+                        BorderThickness="0" Click="BtnSave_Click"/>
+                <TextBlock x:Name="txtExecInfo" VerticalAlignment="Center" Margin="12,0,0,0"
+                           FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+            </StackPanel>
+
+            <Border Grid.Row="2" Background="{StaticResource CardBrush}" CornerRadius="8"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <Grid>
+                    <DataGrid x:Name="dgResult" AutoGenerateColumns="True" IsReadOnly="True"
+                              Background="Transparent" BorderThickness="0"
+                              RowBackground="#FFFFFF" AlternatingRowBackground="#F8FAFC"
+                              GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E2E8F0"
+                              HeadersVisibility="Column" CanUserAddRows="False"
+                              ClipboardCopyMode="IncludeHeader"
+                              Visibility="Collapsed"/>
+                    <TextBlock x:Name="txtMessage" Text="等待执行..."
+                               FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Bottom -->
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="关闭" Width="100" Height="34" FontSize="13"
+                    Background="{StaticResource TextSecondaryBrush}" Foreground="White"
+                    BorderThickness="0" Click="BtnClose_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
