@@ -1,17 +1,55 @@
 using System.IO;
 using System.Windows;
+using Microsoft.Data.SqlClient;
 using Microsoft.Win32;
 
 namespace StudyDemo01
 {
     public partial class RestoreGuideDialog : Window
     {
-        public RestoreGuideDialog()
+        private readonly SqlConnection? _connection;
+
+        public RestoreGuideDialog(SqlConnection? connection = null)
         {
             InitializeComponent();
+            _connection = connection;
             txtBakPath.TextChanged += (s, e) => UpdateSql();
             txtDbName.TextChanged += (s, e) => UpdateSql();
             txtDataPath.TextChanged += (s, e) => UpdateSql();
+        }
+
+        private async void BtnQueryPath_Click(object sender, RoutedEventArgs e)
+        {
+            if (_connection == null || _connection.State != System.Data.ConnectionState.Open)
+            {
+                System.Windows.MessageBox.Show("当前未连接数据库，请先在主界面连接后再使用此功能", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                using var cmd = new SqlCommand(@"
+                    SELECT physical_name 
+                    FROM sys.master_files 
+                    WHERE database_id = DB_ID('master') AND type = 0", _connection);
+                var result = await cmd.ExecuteScalarAsync();
+                if (result != null)
+                {
+                    var dir = Path.GetDirectoryName(result.ToString());
+                    if (!string.IsNullOrEmpty(dir))
+                    {
+                        txtDataPath.Text = dir;
+                    }
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("未能获取数据文件路径", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("查询失败: " + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)

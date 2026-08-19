@@ -202,13 +202,26 @@ namespace StudyDemo01
                 txtLoadingStatus.Text = "正在备份数据库...";
                 txtLoadingDetail.Text = _currentDatabase + " -> " + fullPath;
 
-                using var cmd = new SqlCommand(@"
-                    BACKUP DATABASE [" + _currentDatabase + @"] 
-                    TO DISK = N'" + fullPath.Replace("'", "''") + @"' 
-                    WITH FORMAT, COMPRESSION, STATS = 10", _currentConnection);
-                cmd.CommandTimeout = 600;
-
-                await cmd.ExecuteNonQueryAsync();
+                // 先尝试压缩备份，不支持则自动降级为不压缩
+                var escapedPath = fullPath.Replace("'", "''");
+                try
+                {
+                    using var cmd = new SqlCommand(@"
+                        BACKUP DATABASE [" + _currentDatabase + @"] 
+                        TO DISK = N'" + escapedPath + @"' 
+                        WITH FORMAT, COMPRESSION, STATS = 10", _currentConnection);
+                    cmd.CommandTimeout = 600;
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                catch (Exception ex) when (ex.Message.Contains("COMPRESSION"))
+                {
+                    using var cmd = new SqlCommand(@"
+                        BACKUP DATABASE [" + _currentDatabase + @"] 
+                        TO DISK = N'" + escapedPath + @"' 
+                        WITH FORMAT, STATS = 10", _currentConnection);
+                    cmd.CommandTimeout = 600;
+                    await cmd.ExecuteNonQueryAsync();
+                }
 
                 txtLoadingStatus.Text = "备份完成!";
                 txtLoadingDetail.Text = "文件: " + fullPath;
@@ -242,7 +255,7 @@ namespace StudyDemo01
 
         private void BtnRestoreGuide_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new RestoreGuideDialog();
+            var dialog = new RestoreGuideDialog(_currentConnection);
             dialog.Owner = this;
             dialog.ShowDialog();
         }
