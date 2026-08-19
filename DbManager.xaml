@@ -85,20 +85,25 @@
                                 <TextBlock Text="连接操作" FontSize="18" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <WrapPanel Margin="0,0,0,16">
-                                <Button x:Name="btnConnect" Content="连接数据库" Width="160" Height="44"
-                                        Margin="0,0,12,0" FontSize="14" FontWeight="SemiBold"
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="btnConnect" Content="连接数据库" Height="44"
+                                        Margin="0,0,6,0" FontSize="14" FontWeight="SemiBold"
                                         Background="{StaticResource SuccessBrush}" Foreground="White"
-                                        BorderThickness="0" Click="BtnConnect_Click"/>
-                                <Button x:Name="btnDisconnect" Content="断开连接" Width="160" Height="44"
-                                        Margin="0,0,12,0" FontSize="14" FontWeight="SemiBold"
+                                        BorderThickness="0" Grid.Column="0" Click="BtnConnect_Click"/>
+                                <Button x:Name="btnDisconnect" Content="断开连接" Height="44"
+                                        Margin="6,0,6,0" FontSize="14" FontWeight="SemiBold"
                                         Background="{StaticResource DangerBrush}" Foreground="White"
-                                        BorderThickness="0" IsEnabled="False" Click="BtnDisconnect_Click"/>
-                                <Button x:Name="btnRefresh" Content="刷新配置" Width="160" Height="44"
-                                        FontSize="14" FontWeight="SemiBold"
+                                        BorderThickness="0" IsEnabled="False" Grid.Column="1" Click="BtnDisconnect_Click"/>
+                                <Button x:Name="btnRefresh" Content="更改配置" Height="44"
+                                        Margin="6,0,0,0" FontSize="14" FontWeight="SemiBold"
                                         Background="{StaticResource PrimaryBrush}" Foreground="White"
-                                        BorderThickness="0" Click="BtnRefresh_Click"/>
-                            </WrapPanel>
+                                        BorderThickness="0" Grid.Column="2" Click="BtnChangeConfig_Click"/>
+                            </Grid>
                             <Border x:Name="SuccessBorder" Background="#F0FDF4" CornerRadius="8"
                                     Padding="14,10" Visibility="Collapsed">
                                 <StackPanel Orientation="Horizontal">
@@ -142,12 +147,18 @@
                                 <TextBlock Text="数据操作" FontSize="18" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <UniformGrid Columns="2" Margin="0,0,0,16">
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
                                 <Button x:Name="btnShowTables" Content="查看表结构" Height="60"
                                         FontSize="14" FontWeight="SemiBold" IsEnabled="False"
                                         Background="#EFF6FF" Foreground="{StaticResource PrimaryBrush}"
                                         BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1"
-                                        Click="BtnShowTables_Click" Margin="0,0,12,0">
+                                        Grid.Column="0" Click="BtnShowTables_Click" Margin="0,0,6,0">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
                                             <Border x:Name="border" Background="{TemplateBinding Background}"
@@ -175,9 +186,9 @@
                                 </Button>
                                 <Button x:Name="btnExecSql" Content="执行SQL" Height="60"
                                         FontSize="14" FontWeight="SemiBold" IsEnabled="False"
-                                        Background="#F0FDF4" Foreground="{StaticResource SuccessBrush}"
-                                        BorderBrush="{StaticResource SuccessBrush}" BorderThickness="1"
-                                        Click="BtnExecSql_Click" Margin="6,0">
+                                        Background="#F0FDF4" Foreground="#10B981"
+                                        BorderBrush="#10B981" BorderThickness="1"
+                                        Grid.Column="1" Click="BtnExecSql_Click" Margin="6,0,6,0">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
                                             <Border x:Name="border" Background="{TemplateBinding Background}"
@@ -203,7 +214,64 @@
                                         </ControlTemplate>
                                     </Button.Template>
                                 </Button>
-                            </UniformGrid>
+                                <Button x:Name="btnBackup" Content="数据备份" Height="60"
+                                        FontSize="14" FontWeight="SemiBold" IsEnabled="False"
+                                        Background="#FFF7ED" Foreground="#F97316"
+                                        BorderBrush="#F97316" BorderThickness="1"
+                                        Grid.Column="2" Click="BtnBackup_Click" Margin="6,0,6,0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                                                    CornerRadius="10" Padding="{TemplateBinding Padding}">
+                                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets"
+                                                               FontSize="22" HorizontalAlignment="Center"
+                                                               Foreground="#F97316"/>
+                                                    <TextBlock Text="{TemplateBinding Content}" FontSize="13"
+                                                               FontWeight="SemiBold" HorizontalAlignment="Center"
+                                                               Margin="0,4,0,0" Foreground="#F97316"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#FFEDD5"/>
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter TargetName="border" Property="Opacity" Value="0.4"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                                <Button x:Name="btnRestoreGuide" Content="数据还原" Height="60"
+                                        FontSize="14" FontWeight="SemiBold"
+                                        Background="#F5F3FF" Foreground="#8B5CF6"
+                                        BorderBrush="#8B5CF6" BorderThickness="1"
+                                        Grid.Column="3" Click="BtnRestoreGuide_Click" Margin="6,0,0,0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                                                    CornerRadius="10" Padding="{TemplateBinding Padding}">
+                                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <TextBlock Text="&#xE8A7;" FontFamily="Segoe MDL2 Assets"
+                                                               FontSize="22" HorizontalAlignment="Center"
+                                                               Foreground="#8B5CF6"/>
+                                                    <TextBlock Text="{TemplateBinding Content}" FontSize="13"
+                                                               FontWeight="SemiBold" HorizontalAlignment="Center"
+                                                               Margin="0,4,0,0" Foreground="#8B5CF6"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#EDE9FE"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
                             <TextBlock x:Name="txtHint" Text="请先连接数据库后再使用数据操作功能"
                                        FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
                                        HorizontalAlignment="Center"/>
@@ -212,5 +280,25 @@
                 </StackPanel>
             </ScrollViewer>
         </DockPanel>
+
+        <!-- Loading Overlay -->
+        <Border x:Name="loadingOverlay" Grid.ColumnSpan="2" Background="#80000000"
+                Visibility="Collapsed" IsHitTestVisible="True">
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Background="White" CornerRadius="16" Padding="40,32" MinWidth="320">
+                    <StackPanel HorizontalAlignment="Center">
+                        <ProgressBar x:Name="progressBackup" Width="280" Height="8"
+                                     IsIndeterminate="True" Foreground="#F97316" Background="#FED7AA"
+                                     Margin="0,0,0,20"/>
+                        <TextBlock x:Name="txtLoadingStatus" Text="正在备份数据库..."
+                                   FontSize="16" FontWeight="SemiBold" Foreground="#1E293B"
+                                   HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="txtLoadingDetail" Text="请勿关闭窗口..."
+                                   FontSize="13" Foreground="#94A3B8"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

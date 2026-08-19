@@ -8,6 +8,7 @@ namespace StudyDemo01
     {
         private readonly SqlConnection _connection;
         public string SelectedDatabase { get; private set; } = "";
+        public int DatabaseCount { get; private set; } = 0;
 
         public DatabaseSelectorDialog(SqlConnection connection)
         {
@@ -24,11 +25,17 @@ namespace StudyDemo01
         {
             InitializeComponent();
             _connection = null!;
+            DatabaseCount = databases.Count;
             Loaded += (s, e) =>
             {
                 lstDatabases.ItemsSource = databases;
                 txtLoading.Visibility = Visibility.Collapsed;
                 btnOk.IsEnabled = true;
+                if (databases.Count == 1)
+                {
+                    SelectedDatabase = databases[0];
+                    DialogResult = true;
+                }
             };
             lstDatabases.MouseDoubleClick += (s, e) =>
             {
@@ -53,9 +60,20 @@ namespace StudyDemo01
                     databases.Add(reader.GetString(0));
                 }
 
+                DatabaseCount = databases.Count;
                 lstDatabases.ItemsSource = databases;
                 txtLoading.Visibility = Visibility.Collapsed;
                 btnOk.IsEnabled = true;
+
+                if (databases.Count == 1)
+                {
+                    SelectedDatabase = databases[0];
+                    DialogResult = true;
+                }
+                else if (databases.Count == 0)
+                {
+                    txtLoading.Text = "未找到可用数据库";
+                }
             }
             catch (Exception ex)
             {

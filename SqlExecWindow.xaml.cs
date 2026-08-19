@@ -83,7 +83,7 @@ namespace StudyDemo01
                 ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private void TxtSql_KeyDown(object sender, KeyEventArgs e)
+        private void TxtSql_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F5)
             {

@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.Extensions.Configuration;
 
 namespace StudyDemo01
@@ -69,6 +70,24 @@ namespace StudyDemo01
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             _configuration = builder.Build();
             _databaseConfig = null;
+        }
+
+        public static void Save(DatabaseConfig config)
+        {
+            var json = @"{
+  ""DatabaseSettings"": {
+    ""Server"": """ + config.Server + @""",
+    ""Port"": " + config.Port + @",
+    ""Database"": """ + config.Database + @""",
+    ""UserId"": """ + config.UserId + @""",
+    ""Password"": """ + config.Password + @""",
+    ""TrustServerCertificate"": " + (config.TrustServerCertificate ? "true" : "false") + @",
+    ""ConnectTimeout"": " + config.ConnectTimeout + @"
+  }
+}";
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
+            File.WriteAllText(path, json);
+            Reload();
         }
     }
 }
