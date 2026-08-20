@@ -100,6 +100,11 @@ namespace StudyDemo01
             pageDeviceMonitor.ReloadColors();
         }
 
+        public void ApplyStationFilter()
+        {
+            pageDeviceMonitor.ApplyStationFilter();
+        }
+
         private void EnsureConfigPage()
         {
             if (_agvConfigPage != null) return;
@@ -108,6 +113,9 @@ namespace StudyDemo01
             _agvConfigPage.Visibility = Visibility.Collapsed;
             var parent = pageAgvList.Parent as Panel;
             parent?.Children.Add(_agvConfigPage);
+
+            var row = Grid.GetRow(pageAgvList);
+            Grid.SetRow(_agvConfigPage, row);
         }
 
         private void OnDeviceMonitorRefreshRequested(object? sender, EventArgs e)

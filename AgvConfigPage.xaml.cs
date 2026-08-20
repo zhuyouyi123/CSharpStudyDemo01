@@ -131,6 +131,77 @@ namespace StudyDemo01
             }
         }
 
+        private bool _showUnlinked = true;
+        private bool _showStationTitle = true;
+
+        private void ToggleUnlinked_Click(object sender, MouseButtonEventArgs e)
+        {
+            _showUnlinked = !_showUnlinked;
+            UpdateToggleVisual();
+        }
+
+        private void UpdateToggleVisual()
+        {
+            if (toggleUnlinked != null && toggleUnlinkedThumb != null)
+            {
+                toggleUnlinked.Background = new SolidColorBrush(_showUnlinked ? Color.FromRgb(59, 130, 246) : Color.FromRgb(203, 213, 225));
+                toggleUnlinkedThumb.HorizontalAlignment = _showUnlinked ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+                toggleUnlinkedThumb.Margin = _showUnlinked ? new Thickness(0, 0, 3, 0) : new Thickness(3, 0, 0, 0);
+            }
+            if (toggleStationTitle != null && toggleStationTitleThumb != null)
+            {
+                toggleStationTitle.Background = new SolidColorBrush(_showStationTitle ? Color.FromRgb(59, 130, 246) : Color.FromRgb(203, 213, 225));
+                toggleStationTitleThumb.HorizontalAlignment = _showStationTitle ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+                toggleStationTitleThumb.Margin = _showStationTitle ? new Thickness(0, 0, 3, 0) : new Thickness(3, 0, 0, 0);
+            }
+        }
+
+        private void BtnSaveUnlinked_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var config = ConfigHelper.AgvSettings;
+                config.ShowUnlinkedStations = _showUnlinked;
+                ConfigHelper.SaveAgvConfig(config);
+
+                var window = Window.GetWindow(this);
+                if (window is AgvManager manager)
+                    manager.ApplyStationFilter();
+
+                MessageBox.Show("配置已保存", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("保存失败: " + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ToggleStationTitle_Click(object sender, MouseButtonEventArgs e)
+        {
+            _showStationTitle = !_showStationTitle;
+            UpdateToggleVisual();
+        }
+
+        private void BtnSaveStationTitle_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var config = ConfigHelper.AgvSettings;
+                config.ShowStationTitles = _showStationTitle;
+                ConfigHelper.SaveAgvConfig(config);
+
+                var window = Window.GetWindow(this);
+                if (window is AgvManager manager)
+                    manager.ApplyStationFilter();
+
+                MessageBox.Show("配置已保存", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("保存失败: " + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         public void LoadCurrentConfig()
         {
             var config = ConfigHelper.AgvSettings;
@@ -138,6 +209,9 @@ namespace StudyDemo01
             SetColorInput(txtOnColor, borderOnColorPreview, config.AgvOnLineColor);
             SetColorInput(txtOffColor, borderOffColorPreview, config.AgvOffLineColor);
             SetColorInput(txtAlarmColor, borderAlarmColorPreview, config.AgvAlarmColor);
+            _showUnlinked = config.ShowUnlinkedStations;
+            _showStationTitle = config.ShowStationTitles;
+            UpdateToggleVisual();
         }
 
         private static void SetColorInput(TextBox txt, Border preview, string hex)

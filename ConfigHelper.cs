@@ -37,6 +37,8 @@ namespace StudyDemo01
         public string AgvOnLineColor { get; set; } = "#3B82F6";
         public string AgvOffLineColor { get; set; } = "#94A3B8";
         public string AgvAlarmColor { get; set; } = "#EF4444";
+        public bool ShowUnlinkedStations { get; set; } = true;
+        public bool ShowStationTitles { get; set; } = true;
     }
 
     public static class ConfigHelper

@@ -3,37 +3,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="800">
-    <Grid Background="Transparent">
+             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="800"
+             VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <Grid Background="Transparent" Margin="24,20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Title Bar -->
-        <Border Grid.Row="0" Background="White" Padding="32,20">
-            <TextBlock Text="AGV功能配置" FontSize="20" FontWeight="SemiBold"
-                       Foreground="#1E293B"/>
-        </Border>
-
-        <!-- Config Area -->
-        <Border Grid.Row="1" Background="White" CornerRadius="12"
-                Margin="24,20" Padding="24,20">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Border Grid.Row="0" Background="White" CornerRadius="12" Padding="24,20"
+                BorderBrush="#E2E8F0" BorderThickness="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel>
 
-                    <!-- Section: 地图监控 -->
-                    <TextBlock Text="地图监控" FontSize="13" FontWeight="SemiBold"
-                               Foreground="#64748B" Margin="0,0,0,12"/>
-
-                    <!-- 刷新间隔 -->
-                    <Border Background="Transparent" Padding="0,14" BorderBrush="#E2E8F0"
-                            BorderThickness="0,0,0,1">
+                    <!-- 数据刷新间隔 -->
+                    <Border Padding="0,16" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
                         <DockPanel>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="数据刷新间隔" FontSize="14" Foreground="#1E293B"/>
-                                <TextBlock Text="设备监控地图的自动刷新频率" FontSize="12"
-                                           Foreground="#94A3B8" Margin="0,2,0,0"/>
+                                <TextBlock Text="数据刷新间隔" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B"/>
+                                <TextBlock Text="设备监控地图的自动刷新频率" FontSize="12" Foreground="#94A3B8" Margin="0,2,0,0"/>
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                         VerticalAlignment="Center" HorizontalAlignment="Right">
@@ -42,8 +29,7 @@
                                         <TextBox x:Name="txtRefreshInterval" Width="48" FontSize="14"
                                                  FontWeight="SemiBold" Foreground="#1E293B"
                                                  VerticalContentAlignment="Center" TextAlignment="Center"
-                                                 BorderThickness="0" Background="Transparent"
-                                                 MaxLength="3"/>
+                                                 BorderThickness="0" Background="Transparent" MaxLength="3"/>
                                         <TextBlock Text="秒" FontSize="12" Foreground="#94A3B8"
                                                    VerticalAlignment="Center" Margin="4,0,8,0"/>
                                     </StackPanel>
@@ -51,42 +37,80 @@
                                 <Button Content="保存" Width="56" Height="28" FontSize="12"
                                         FontWeight="SemiBold" Foreground="White" BorderThickness="0"
                                         Margin="8,0,0,0" Click="BtnSaveRefresh_Click">
-                                    <Button.Background>
-                                        <SolidColorBrush Color="#3B82F6"/>
-                                    </Button.Background>
+                                    <Button.Background><SolidColorBrush Color="#3B82F6"/></Button.Background>
                                 </Button>
                             </StackPanel>
                         </DockPanel>
                     </Border>
 
-                    <!-- Section: AGV颜色 -->
-                    <TextBlock Text="AGV颜色" FontSize="13" FontWeight="SemiBold"
-                               Foreground="#64748B" Margin="0,24,0,12"/>
-
-                    <!-- 在线颜色 -->
-                    <Border Background="Transparent" Padding="0,14" BorderBrush="#E2E8F0"
-                            BorderThickness="0,0,0,1">
+                    <!-- 显示无连线站点 -->
+                    <Border Padding="0,16" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
                         <DockPanel>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="在线" FontSize="14" Foreground="#1E293B"/>
-                                <TextBlock Text="AGV在线状态显示颜色" FontSize="12"
-                                           Foreground="#94A3B8" Margin="0,2,0,0"/>
+                                <TextBlock Text="显示无连线站点" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B"/>
+                                <TextBlock Text="关闭后设备监控地图隐藏无连线的站点" FontSize="12" Foreground="#94A3B8" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                                        VerticalAlignment="Center" HorizontalAlignment="Right">
+                                <Border x:Name="toggleUnlinked" Width="44" Height="24" CornerRadius="12"
+                                        Background="#3B82F6" Cursor="Hand" Margin="0,0,8,0"
+                                        MouseLeftButtonDown="ToggleUnlinked_Click">
+                                    <Border x:Name="toggleUnlinkedThumb" Width="18" Height="18"
+                                            CornerRadius="9" Background="White" HorizontalAlignment="Right" Margin="0,0,3,0"/>
+                                </Border>
+                                <Button Content="保存" Width="56" Height="28" FontSize="12"
+                                        FontWeight="SemiBold" Foreground="White" BorderThickness="0"
+                                        Click="BtnSaveUnlinked_Click">
+                                    <Button.Background><SolidColorBrush Color="#3B82F6"/></Button.Background>
+                                </Button>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- 显示站点标题 -->
+                    <Border Padding="0,16" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+                        <DockPanel>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="显示站点标题" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B"/>
+                                <TextBlock Text="关闭后设备监控地图隐藏站点编号文字" FontSize="12" Foreground="#94A3B8" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                                        VerticalAlignment="Center" HorizontalAlignment="Right">
+                                <Border x:Name="toggleStationTitle" Width="44" Height="24" CornerRadius="12"
+                                        Background="#3B82F6" Cursor="Hand" Margin="0,0,8,0"
+                                        MouseLeftButtonDown="ToggleStationTitle_Click">
+                                    <Border x:Name="toggleStationTitleThumb" Width="18" Height="18"
+                                            CornerRadius="9" Background="White" HorizontalAlignment="Right" Margin="0,0,3,0"/>
+                                </Border>
+                                <Button Content="保存" Width="56" Height="28" FontSize="12"
+                                        FontWeight="SemiBold" Foreground="White" BorderThickness="0"
+                                        Click="BtnSaveStationTitle_Click">
+                                    <Button.Background><SolidColorBrush Color="#3B82F6"/></Button.Background>
+                                </Button>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- 在线颜色 -->
+                    <Border Padding="0,16" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+                        <DockPanel>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="在线颜色" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B"/>
+                                <TextBlock Text="AGV在线状态显示颜色" FontSize="12" Foreground="#94A3B8" Margin="0,2,0,0"/>
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                         VerticalAlignment="Center" HorizontalAlignment="Right">
                                 <Grid>
                                     <Border x:Name="borderOnColorPreview" Width="28" Height="28"
                                             CornerRadius="6" BorderBrush="#E2E8F0" BorderThickness="1"
-                                            Cursor="Hand" MouseLeftButtonDown="OnColorPreview_Click"
-                                            Tag="txtOnColor"/>
-                                    <Popup x:Name="popupOnColor" StaysOpen="True" PlacementTarget="{Binding ElementName=borderOnColorPreview}"
+                                            Cursor="Hand" MouseLeftButtonDown="OnColorPreview_Click" Tag="txtOnColor"/>
+                                    <Popup x:Name="popupOnColor" StaysOpen="True"
+                                           PlacementTarget="{Binding ElementName=borderOnColorPreview}"
                                            Placement="Bottom" AllowsTransparency="True">
                                         <Border Background="White" CornerRadius="8" Padding="8"
                                                 BorderBrush="#E2E8F0" BorderThickness="1"
                                                 PreviewMouseLeftButtonDown="PopupBorder_PreviewMouseDown">
-                                            <Border.Effect>
-                                                <DropShadowEffect BlurRadius="8" Opacity="0.15" ShadowDepth="2"/>
-                                            </Border.Effect>
+                                            <Border.Effect><DropShadowEffect BlurRadius="8" Opacity="0.15" ShadowDepth="2"/></Border.Effect>
                                             <UniformGrid Columns="6" Width="192">
                                                 <Border Background="#10B981" Width="24" Height="24" CornerRadius="4" Margin="2" Cursor="Hand" MouseLeftButtonDown="ColorSwatch_Click" Tag="On:#10B981"/>
                                                 <Border Background="#3B82F6" Width="24" Height="24" CornerRadius="4" Margin="2" Cursor="Hand" MouseLeftButtonDown="ColorSwatch_Click" Tag="On:#3B82F6"/>
@@ -106,22 +130,20 @@
                     </Border>
 
                     <!-- 离线颜色 -->
-                    <Border Background="Transparent" Padding="0,14" BorderBrush="#E2E8F0"
-                            BorderThickness="0,0,0,1">
+                    <Border Padding="0,16" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
                         <DockPanel>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="离线" FontSize="14" Foreground="#1E293B"/>
-                                <TextBlock Text="AGV离线状态显示颜色" FontSize="12"
-                                           Foreground="#94A3B8" Margin="0,2,0,0"/>
+                                <TextBlock Text="离线颜色" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B"/>
+                                <TextBlock Text="AGV离线状态显示颜色" FontSize="12" Foreground="#94A3B8" Margin="0,2,0,0"/>
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                         VerticalAlignment="Center" HorizontalAlignment="Right">
                                 <Grid>
                                     <Border x:Name="borderOffColorPreview" Width="28" Height="28"
                                             CornerRadius="6" BorderBrush="#E2E8F0" BorderThickness="1"
-                                            Cursor="Hand" MouseLeftButtonDown="OnColorPreview_Click"
-                                            Tag="txtOffColor"/>
-                                    <Popup x:Name="popupOffColor" StaysOpen="True" PlacementTarget="{Binding ElementName=borderOffColorPreview}"
+                                            Cursor="Hand" MouseLeftButtonDown="OnColorPreview_Click" Tag="txtOffColor"/>
+                                    <Popup x:Name="popupOffColor" StaysOpen="True"
+                                           PlacementTarget="{Binding ElementName=borderOffColorPreview}"
                                            Placement="Bottom" AllowsTransparency="True">
                                         <Border Background="White" CornerRadius="8" Padding="8"
                                                 BorderBrush="#E2E8F0" BorderThickness="1"
@@ -145,22 +167,20 @@
                     </Border>
 
                     <!-- 报警颜色 -->
-                    <Border Background="Transparent" Padding="0,14" BorderBrush="#E2E8F0"
-                            BorderThickness="0,0,0,1">
+                    <Border Padding="0,16" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
                         <DockPanel>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="报警" FontSize="14" Foreground="#1E293B"/>
-                                <TextBlock Text="AGV报警状态显示颜色" FontSize="12"
-                                           Foreground="#94A3B8" Margin="0,2,0,0"/>
+                                <TextBlock Text="报警颜色" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B"/>
+                                <TextBlock Text="AGV报警状态显示颜色" FontSize="12" Foreground="#94A3B8" Margin="0,2,0,0"/>
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                         VerticalAlignment="Center" HorizontalAlignment="Right">
                                 <Grid>
                                     <Border x:Name="borderAlarmColorPreview" Width="28" Height="28"
                                             CornerRadius="6" BorderBrush="#E2E8F0" BorderThickness="1"
-                                            Cursor="Hand" MouseLeftButtonDown="OnColorPreview_Click"
-                                            Tag="txtAlarmColor"/>
-                                    <Popup x:Name="popupAlarmColor" StaysOpen="True" PlacementTarget="{Binding ElementName=borderAlarmColorPreview}"
+                                            Cursor="Hand" MouseLeftButtonDown="OnColorPreview_Click" Tag="txtAlarmColor"/>
+                                    <Popup x:Name="popupAlarmColor" StaysOpen="True"
+                                           PlacementTarget="{Binding ElementName=borderAlarmColorPreview}"
                                            Placement="Bottom" AllowsTransparency="True">
                                         <Border Background="White" CornerRadius="8" Padding="8"
                                                 BorderBrush="#E2E8F0" BorderThickness="1"
@@ -183,17 +203,14 @@
                         </DockPanel>
                     </Border>
 
-                    <!-- 颜色保存按钮 -->
-                    <Border Background="Transparent" Padding="0,16">
+                    <!-- 保存 -->
+                    <Border Padding="0,20">
                         <DockPanel>
-                            <TextBlock Text="修改后请保存以生效" FontSize="12" Foreground="#94A3B8"
-                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="修改后请保存以生效" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
                             <Button Content="保存" Width="72" Height="32" FontSize="13"
                                     FontWeight="SemiBold" Foreground="White" BorderThickness="0"
                                     HorizontalAlignment="Right" Click="BtnSaveColors_Click">
-                                <Button.Background>
-                                    <SolidColorBrush Color="#3B82F6"/>
-                                </Button.Background>
+                                <Button.Background><SolidColorBrush Color="#3B82F6"/></Button.Background>
                             </Button>
                         </DockPanel>
                     </Border>
@@ -201,6 +218,5 @@
                 </StackPanel>
             </ScrollViewer>
         </Border>
-
     </Grid>
 </UserControl>

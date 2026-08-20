@@ -59,6 +59,22 @@ namespace StudyDemo01
             DrawMap();
         }
 
+        public void ApplyStationFilter()
+        {
+            DrawMap();
+        }
+
+        private HashSet<string> GetLinkedStationIds()
+        {
+            var linked = new HashSet<string>();
+            foreach (var link in _linkList)
+            {
+                linked.Add(link.FromStation);
+                linked.Add(link.ToStation);
+            }
+            return linked;
+        }
+
         private static Brush? CreateFrozenBrush(string hex)
         {
             if (string.IsNullOrWhiteSpace(hex)) return null;
@@ -340,8 +356,15 @@ namespace StudyDemo01
             DrawAxisLabels(_dataMinX, _dataMaxX, _dataMinY, _dataMaxY);
             DrawLinks(w, h);
 
+            var showUnlinked = ConfigHelper.AgvSettings.ShowUnlinkedStations;
+            var linkedIds = showUnlinked ? null : GetLinkedStationIds();
+
             foreach (var station in _stationList)
+            {
+                if (linkedIds != null && !linkedIds.Contains(station.StationId))
+                    continue;
                 DrawStation(station, ScreenX(station.X, w), ScreenY(station.Y, h));
+            }
 
             for (int i = 0; i < _agvList.Count; i++)
             {
@@ -428,19 +451,22 @@ namespace StudyDemo01
             Canvas.SetZIndex(diamond, 5);
             mapCanvas.Children.Add(diamond);
 
-            var label = new TextBlock
+            if (ConfigHelper.AgvSettings.ShowStationTitles)
             {
-                Text = station.StationId,
-                FontSize = 8,
-                FontWeight = FontWeights.SemiBold,
-                Foreground = StationLabelBrush,
-                TextAlignment = TextAlignment.Center,
-                Width = 24
-            };
-            Canvas.SetLeft(label, px - 12);
-            Canvas.SetTop(label, py + half + 2);
-            Canvas.SetZIndex(label, 6);
-            mapCanvas.Children.Add(label);
+                var label = new TextBlock
+                {
+                    Text = station.StationId,
+                    FontSize = 8,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = StationLabelBrush,
+                    TextAlignment = TextAlignment.Center,
+                    Width = 24
+                };
+                Canvas.SetLeft(label, px - 12);
+                Canvas.SetTop(label, py + half + 2);
+                Canvas.SetZIndex(label, 6);
+                mapCanvas.Children.Add(label);
+            }
 
             var hitArea = new Ellipse
             {
