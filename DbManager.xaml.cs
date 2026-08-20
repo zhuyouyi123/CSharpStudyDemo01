@@ -1,3 +1,4 @@
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -21,6 +22,17 @@ namespace StudyDemo01
         {
         }
 
+        private void DisposeConnection()
+        {
+            if (_currentConnection != null)
+            {
+                try { _currentConnection.Close(); } catch { }
+                try { _currentConnection.Dispose(); } catch { }
+                _currentConnection = null;
+            }
+            _isConnected = false;
+        }
+
         private async void BtnConnect_Click(object sender, RoutedEventArgs e)
         {
             if (_isConnected) return;
@@ -41,7 +53,6 @@ namespace StudyDemo01
                 selector.Owner = this;
                 string selectedDb;
 
-                // 先查询数据库列表，再决定是否弹窗
                 var dbList = new List<string>();
                 using (var cmd = new SqlCommand(@"
                     SELECT name FROM sys.databases 
@@ -56,9 +67,7 @@ namespace StudyDemo01
 
                 if (dbList.Count == 0)
                 {
-                    _currentConnection.Close();
-                    _currentConnection.Dispose();
-                    _currentConnection = null;
+                    DisposeConnection();
                     btnConnect.IsEnabled = true;
                     btnConnect.Content = "连接数据库";
                     ShowError("错误", "未找到可用数据库");
@@ -74,9 +83,7 @@ namespace StudyDemo01
                     listSelector.Owner = this;
                     if (listSelector.ShowDialog() != true)
                     {
-                        _currentConnection.Close();
-                        _currentConnection.Dispose();
-                        _currentConnection = null;
+                        DisposeConnection();
                         btnConnect.IsEnabled = true;
                         btnConnect.Content = "连接数据库";
                         return;
@@ -122,13 +129,7 @@ namespace StudyDemo01
 
             try
             {
-                if (_currentConnection != null)
-                {
-                    _currentConnection.Close();
-                    _currentConnection.Dispose();
-                    _currentConnection = null;
-                }
-                _isConnected = false;
+                DisposeConnection();
                 UpdateStatus(false);
                 ShowSuccess("已成功断开数据库连接");
 
@@ -166,7 +167,7 @@ namespace StudyDemo01
 
         private void BtnShowTables_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentConnection == null || _currentConnection.State != System.Data.ConnectionState.Open) return;
+            if (_currentConnection == null || _currentConnection.State != ConnectionState.Open) return;
             var win = new TablesWindow(_currentConnection);
             win.Owner = this;
             win.ShowDialog();
@@ -174,7 +175,7 @@ namespace StudyDemo01
 
         private void BtnExecSql_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentConnection == null || _currentConnection.State != System.Data.ConnectionState.Open) return;
+            if (_currentConnection == null || _currentConnection.State != ConnectionState.Open) return;
             var win = new SqlExecWindow(_currentConnection, _currentDatabase);
             win.Owner = this;
             win.ShowDialog();
@@ -182,7 +183,7 @@ namespace StudyDemo01
 
         private async void BtnBackup_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentConnection == null || _currentConnection.State != System.Data.ConnectionState.Open) return;
+            if (_currentConnection == null || _currentConnection.State != ConnectionState.Open) return;
 
             var dialog = new SaveBackupDialog(_currentDatabase);
             dialog.Owner = this;
@@ -202,22 +203,22 @@ namespace StudyDemo01
                 txtLoadingStatus.Text = "正在备份数据库...";
                 txtLoadingDetail.Text = _currentDatabase + " -> " + fullPath;
 
-                // 先尝试压缩备份，不支持则自动降级为不压缩
                 var escapedPath = fullPath.Replace("'", "''");
+                var safeDbName = _currentDatabase.Replace("]", "]]");
                 try
                 {
-                    using var cmd = new SqlCommand(@"
-                        BACKUP DATABASE [" + _currentDatabase + @"] 
-                        TO DISK = N'" + escapedPath + @"' 
+                    using var cmd = new SqlCommand($@"
+                        BACKUP DATABASE [{safeDbName}] 
+                        TO DISK = N'{escapedPath}' 
                         WITH FORMAT, COMPRESSION, STATS = 10", _currentConnection);
                     cmd.CommandTimeout = 600;
                     await cmd.ExecuteNonQueryAsync();
                 }
                 catch (Exception ex) when (ex.Message.Contains("COMPRESSION"))
                 {
-                    using var cmd = new SqlCommand(@"
-                        BACKUP DATABASE [" + _currentDatabase + @"] 
-                        TO DISK = N'" + escapedPath + @"' 
+                    using var cmd = new SqlCommand($@"
+                        BACKUP DATABASE [{safeDbName}] 
+                        TO DISK = N'{escapedPath}' 
                         WITH FORMAT, STATS = 10", _currentConnection);
                     cmd.CommandTimeout = 600;
                     await cmd.ExecuteNonQueryAsync();
@@ -316,17 +317,7 @@ namespace StudyDemo01
                 var result = MessageBox.Show("数据库当前处于连接状态，确定要返回吗？",
                     "提示", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.No) return;
-                try
-                {
-                    if (_currentConnection != null)
-                    {
-                        _currentConnection.Close();
-                        _currentConnection.Dispose();
-                        _currentConnection = null;
-                    }
-                    _isConnected = false;
-                }
-                catch { }
+                DisposeConnection();
             }
             this.Close();
             if (Owner != null) Owner.Show();
@@ -334,17 +325,7 @@ namespace StudyDemo01
 
         protected override void OnClosed(EventArgs e)
         {
-            try
-            {
-                if (_currentConnection != null)
-                {
-                    _currentConnection.Close();
-                    _currentConnection.Dispose();
-                    _currentConnection = null;
-                }
-                _isConnected = false;
-            }
-            catch { }
+            DisposeConnection();
             base.OnClosed(e);
         }
     }
