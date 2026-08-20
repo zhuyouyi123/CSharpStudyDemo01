@@ -13,6 +13,7 @@ namespace StudyDemo01
         private bool _monitorInitialized = false;
         private bool _navHandlersWired = false;
         private AgvConfigPage? _agvConfigPage;
+        private FencePage? _fencePage;
         private volatile bool _isRefreshing = false;
         private volatile bool _isConnecting = false;
 
@@ -23,6 +24,7 @@ namespace StudyDemo01
             navAgvList.PreviewMouseLeftButtonDown += Nav_PreClick;
             navQueueInfo.PreviewMouseLeftButtonDown += Nav_PreClick;
             navTaskManage.PreviewMouseLeftButtonDown += Nav_PreClick;
+            navFence.PreviewMouseLeftButtonDown += Nav_PreClick;
             navSettings.PreviewMouseLeftButtonDown += Nav_PreClick;
         }
 
@@ -38,6 +40,7 @@ namespace StudyDemo01
             pageQueueInfo.Visibility = Visibility.Collapsed;
             pageDeviceMonitor.Visibility = Visibility.Collapsed;
             if (_agvConfigPage != null) _agvConfigPage.Visibility = Visibility.Collapsed;
+            if (_fencePage != null) _fencePage.Visibility = Visibility.Collapsed;
 
             if (sender == navAgvList)
             {
@@ -57,6 +60,14 @@ namespace StudyDemo01
                 txtTitle.Text = "设备监控";
                 RestoreHeader();
                 _ = EnsureMonitorConnectionAsync();
+            }
+            else if (sender == navFence)
+            {
+                EnsureFencePage();
+                _fencePage!.RefreshFenceTypes();
+                _fencePage.Visibility = Visibility.Visible;
+                txtTitle.Text = "围栏管理";
+                RestoreHeader();
             }
             else if (sender == navSettings)
             {
@@ -116,6 +127,19 @@ namespace StudyDemo01
 
             var row = Grid.GetRow(pageAgvList);
             Grid.SetRow(_agvConfigPage, row);
+        }
+
+        private void EnsureFencePage()
+        {
+            if (_fencePage != null) return;
+
+            _fencePage = new FencePage();
+            _fencePage.Visibility = Visibility.Collapsed;
+            var parent = pageAgvList.Parent as Panel;
+            parent?.Children.Add(_fencePage);
+
+            var row = Grid.GetRow(pageAgvList);
+            Grid.SetRow(_fencePage, row);
         }
 
         private void OnDeviceMonitorRefreshRequested(object? sender, EventArgs e)

@@ -1,0 +1,238 @@
+<UserControl x:Class="StudyDemo01.FencePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="900">
+    <Grid x:Name="rootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition x:Name="sidebarColumn" Width="190"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Map Area -->
+        <Border Grid.Column="0" Background="White" CornerRadius="8"
+                BorderBrush="#E2E8F0" BorderThickness="1" Margin="0,0,8,0" ClipToBounds="True">
+            <Grid x:Name="mapContainer">
+                <Canvas x:Name="mapCanvas" Background="#F8FAFC"/>
+
+                <!-- Toolbar -->
+                <Border Panel.ZIndex="90" HorizontalAlignment="Left" VerticalAlignment="Top"
+                        Margin="12,12,0,0" Background="White" CornerRadius="8"
+                        BorderBrush="#E2E8F0" BorderThickness="1">
+                    <StackPanel Orientation="Horizontal" Margin="6">
+                        <Button x:Name="btnDraw" Content="绘制围栏" Width="76" Height="30"
+                                FontSize="12" FontWeight="SemiBold" Foreground="White"
+                                BorderThickness="0" Cursor="Hand" Click="BtnDraw_Click"
+                                Margin="0,0,8,0" Background="#3B82F6">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                            CornerRadius="6" Padding="12,0">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="bd" Property="Background">
+                                                <Setter.Value><SolidColorBrush Color="#2563EB"/></Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Button x:Name="btnFinish" Content="完成绘制" Width="76" Height="30"
+                                FontSize="12" FontWeight="SemiBold" Foreground="White"
+                                BorderThickness="0" Cursor="Hand" Click="BtnFinish_Click"
+                                Visibility="Collapsed" Margin="0,0,8,0" Background="#10B981">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                            CornerRadius="6" Padding="12,0">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="bd" Property="Background">
+                                                <Setter.Value><SolidColorBrush Color="#059669"/></Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Button x:Name="btnCancel" Content="取消" Width="56" Height="30"
+                                FontSize="12" Foreground="#64748B" Background="Transparent"
+                                BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand"
+                                Click="BtnCancel_Click" Visibility="Collapsed" Margin="0,0,8,0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bd" Background="White" BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="1" CornerRadius="6" Padding="12,0">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="bd" Property="Background">
+                                                <Setter.Value><SolidColorBrush Color="#F1F5F9"/></Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Button x:Name="btnDelete" Content="删除选中" Width="76" Height="30"
+                                FontSize="12" FontWeight="SemiBold" Foreground="White"
+                                BorderThickness="0" Cursor="Hand" Click="BtnDelete_Click"
+                                Visibility="Collapsed" Background="#EF4444">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                            CornerRadius="6" Padding="12,0">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="bd" Property="Background">
+                                                <Setter.Value><SolidColorBrush Color="#DC2626"/></Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <TextBlock x:Name="txtDrawHint" Text="" FontSize="11" Foreground="#94A3B8"
+                                   VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Fence Type Selector -->
+                <Border x:Name="fenceTypePanel" Panel.ZIndex="90" HorizontalAlignment="Left"
+                        VerticalAlignment="Top" Margin="12,52,0,0" Background="White"
+                        CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1"
+                        Visibility="Collapsed">
+                    <StackPanel Margin="8,6">
+                        <TextBlock Text="围栏类型" FontSize="11" Foreground="#64748B" Margin="0,0,0,4"/>
+                        <ComboBox x:Name="cmbFenceType" Width="160" FontSize="12"
+                                  SelectionChanged="CmbFenceType_Changed"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Zoom Controls -->
+                <StackPanel Panel.ZIndex="90" HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom" Margin="0,0,12,12">
+                    <Border Background="White" CornerRadius="8" BorderBrush="#E2E8F0"
+                            BorderThickness="1">
+                        <StackPanel>
+                            <Button Content="+" FontSize="18" FontWeight="Bold" Width="32" Height="32"
+                                    Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                    Foreground="#475569" Click="BtnZoomIn_Click"/>
+                            <Border Height="1" Background="#E2E8F0"/>
+                            <Button Content="-" FontSize="18" FontWeight="Bold" Width="32" Height="32"
+                                    Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                    Foreground="#475569" Click="BtnZoomOut_Click"/>
+                            <Border Height="1" Background="#E2E8F0"/>
+                            <Button Content="&#x21BB;" FontSize="14" Width="32" Height="32"
+                                    Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                    Foreground="#475569" Click="BtnResetView_Click"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <TextBlock x:Name="txtZoom" Panel.ZIndex="90" HorizontalAlignment="Left"
+                           VerticalAlignment="Bottom" Margin="12,0,0,14" FontSize="10"
+                           Foreground="#94A3B8" Background="#F8FAFC" Padding="6,2"/>
+
+                <!-- Tips Popup (auto-close) -->
+                <Popup x:Name="tipsPopup" Panel.ZIndex="100" IsOpen="False"
+                       AllowsTransparency="True" Placement="Top"
+                       PlacementTarget="{Binding ElementName=mapCanvas}"
+                       StaysOpen="True" IsHitTestVisible="False">
+                    <Border Background="#FEF2F2" CornerRadius="6"
+                            BorderBrush="#FECACA" BorderThickness="1" Padding="10,6"
+                            Margin="0,0,0,4">
+                        <TextBlock x:Name="tipsText" FontSize="12" Foreground="#DC2626"
+                                   FontWeight="SemiBold"/>
+                    </Border>
+                </Popup>
+
+                <!-- Name Input Popup -->
+                <Popup x:Name="popupNameInput" Panel.ZIndex="100" IsOpen="False"
+                       AllowsTransparency="True" Placement="Center"
+                       StaysOpen="True">
+                    <Border Background="White" CornerRadius="10" Padding="20"
+                            BorderBrush="#E2E8F0" BorderThickness="1" MinWidth="280">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="16" Opacity="0.12" ShadowDepth="4"/>
+                        </Border.Effect>
+                        <StackPanel>
+                            <TextBlock Text="输入围栏名称" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="#1E293B" Margin="0,0,0,12"/>
+                            <Border CornerRadius="6" BorderBrush="#E2E8F0" BorderThickness="1"
+                                    Background="#F8FAFC" Padding="2,2">
+                                <TextBox x:Name="txtInputFenceName" BorderThickness="0"
+                                         Padding="8,8" FontSize="13" Background="Transparent"
+                                         MaxLength="30"
+                                         PreviewKeyDown="TxtInputFenceName_PreviewKeyDown"/>
+                            </Border>
+                            <TextBlock x:Name="txtNameInputError" Text="" FontSize="11"
+                                       Foreground="#EF4444" Margin="0,4,0,0" MinHeight="16"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                        Margin="0,12,0,0">
+                                <Button Content="取消" Width="60" Height="30" FontSize="12"
+                                        Foreground="#64748B" Background="White" BorderBrush="#E2E8F0"
+                                        BorderThickness="1" Cursor="Hand" Margin="0,0,8,0"
+                                        Click="BtnNameInputCancel_Click">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="White" BorderBrush="#E2E8F0"
+                                                    BorderThickness="1" CornerRadius="6" Padding="12,0">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                                <Button Content="确认" Width="60" Height="30" FontSize="12"
+                                        FontWeight="SemiBold" Foreground="White" BorderThickness="0"
+                                        Cursor="Hand" Click="BtnNameInputOk_Click">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="bd" Background="#3B82F6" CornerRadius="6"
+                                                    Padding="12,0">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="bd" Property="Background">
+                                                        <Setter.Value><SolidColorBrush Color="#2563EB"/></Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
+            </Grid>
+        </Border>
+
+        <!-- Fence List Sidebar -->
+        <Border x:Name="fenceListSidebar" Grid.Column="1" Background="White" CornerRadius="8"
+                BorderBrush="#E2E8F0" BorderThickness="1">
+            <DockPanel>
+                <Border DockPanel.Dock="Top" Padding="10,8" BorderBrush="#E2E8F0"
+                        BorderThickness="0,0,0,1">
+                    <TextBlock Text="围栏列表" FontSize="13" FontWeight="SemiBold" Foreground="#1E293B"/>
+                </Border>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="fenceListPanel" Margin="6,6"/>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

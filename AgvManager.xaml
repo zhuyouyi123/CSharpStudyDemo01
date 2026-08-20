@@ -37,11 +37,13 @@
                     <RadioButton x:Name="navQueueInfo" Content="  队列信息"
                                  Style="{StaticResource SidebarMenuItem}"
                                  Click="NavQueueInfo_Click"/>
-                    <RadioButton x:Name="navTaskManage" Content="  设备监控"
-                                 Style="{StaticResource SidebarMenuItem}"
-                                 Click="NavDeviceMonitor_Click"/>
-                     <RadioButton x:Name="navSettings" Content="  AGV功能配置"
-                                 Style="{StaticResource SidebarMenuItem}"/>
+                     <RadioButton x:Name="navTaskManage" Content="  设备监控"
+                                  Style="{StaticResource SidebarMenuItem}"
+                                  Click="NavDeviceMonitor_Click"/>
+                      <RadioButton x:Name="navFence" Content="  围栏管理"
+                                  Style="{StaticResource SidebarMenuItem}"/>
+                      <RadioButton x:Name="navSettings" Content="  AGV功能配置"
+                                  Style="{StaticResource SidebarMenuItem}"/>
                 </StackPanel>
             </DockPanel>
         </Border>

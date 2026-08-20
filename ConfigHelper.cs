@@ -39,6 +39,10 @@ namespace StudyDemo01
         public string AgvAlarmColor { get; set; } = "#EF4444";
         public bool ShowUnlinkedStations { get; set; } = true;
         public bool ShowStationTitles { get; set; } = true;
+        public bool ShowFences { get; set; } = false;
+        public int AgvAngleOffset { get; set; } = 0;
+        public int AgvIconSize { get; set; } = 22;
+        public List<FenceTypeInfo> FenceTypes { get; set; } = new();
     }
 
     public static class ConfigHelper
@@ -120,10 +124,26 @@ namespace StudyDemo01
             }
         }
 
-        private static void WriteJsonConfig(object dbSettings, object agvSettings)
+        private static void WriteJsonConfig(object dbSettings, AgvConfig agvSettings)
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
-            var configObj = new { DatabaseSettings = dbSettings, AgvSettings = agvSettings };
+
+            var dict = new Dictionary<string, object?>
+            {
+                ["MapRefreshInterval"] = agvSettings.MapRefreshInterval,
+                ["AgvOnLineColor"] = agvSettings.AgvOnLineColor,
+                ["AgvOffLineColor"] = agvSettings.AgvOffLineColor,
+                ["AgvAlarmColor"] = agvSettings.AgvAlarmColor,
+                ["ShowUnlinkedStations"] = agvSettings.ShowUnlinkedStations,
+                ["ShowStationTitles"] = agvSettings.ShowStationTitles,
+                ["ShowFences"] = agvSettings.ShowFences,
+                ["AgvAngleOffset"] = agvSettings.AgvAngleOffset,
+                ["AgvIconSize"] = agvSettings.AgvIconSize
+            };
+            if (agvSettings.FenceTypes != null && agvSettings.FenceTypes.Count > 0)
+                dict["FenceTypes"] = agvSettings.FenceTypes;
+
+            var configObj = new { DatabaseSettings = dbSettings, AgvSettings = dict };
             var json = JsonSerializer.Serialize(configObj, options);
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
             File.WriteAllText(path, json);
